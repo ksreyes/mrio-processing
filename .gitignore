@@ -1,0 +1,9 @@
+data/final/
+data/raw/
+
+# R
+.Rproj.user
+.Rhistory
+
+# Mac OS-specific storage files
+.DS_Store
