@@ -1,5 +1,11 @@
 # MRIO Processing Scripts
 
-The ADB Multi-Regional Input-Output Tables are produced by the MRIO team. They are stored in Excel format with plenty of formatting. While this makes them easily readable by humans, they are harder to work with programmatically. Their file sizes are also larger than needed.
+The ADB Multi-Regional Input-Output Tables are produced by the MRIO team. The scripts in this repo processes the raw Excel files and outputs various datasets used in global value chain analysis. 
 
-The scripts in this repo converts these Excel files into machine-readable format, saved as space-optimal parquet files.
+The following provides a brief description of each notebook.
+
+1. `process-mrios.ipynb`
+Converts Excel files into machine-readable format and saved as space-optimal parquet files. Outputs are at `data/interim/`.
+
+1. `trade-accounting.ipynb`
+Performs the Borin and Mancini (2019) decomposition. 
