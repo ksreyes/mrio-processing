@@ -11,7 +11,7 @@ Converts Excel files into machine-readable format and saved as space-optimal par
 Tabulates key aggregates for each country and country-sector. Results are saved as `summary.csv` in `data/final/`.
 
 1. `trade-accounting.ipynb`
-Performs the Borin and Mancini (2019) exports decomposition. Results are saved as `ta.parquet`, `ta-es.parquet`, and `ta-os.parquet` in `data/interim/`.
+Performs the Borin and Mancini (2019) exports decomposition. Results are saved as `ta.parquet`, `ta-es.parquet`, and `ta-os.parquet` in `data/interim/trade-accounting/`.
 
 1. `gvc-participation.ipynb`
 Computes the trade-based and production-based GVC participation rates. Results are saved as `gvcp.csv` in `data/final/`.
