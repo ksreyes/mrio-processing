@@ -15,32 +15,3 @@ Performs the Borin and Mancini (2019) exports decomposition. Results are saved a
 
 1. `gvc-participation.ipynb`
 Computes the trade-based and production-based GVC participation rates. Results are saved as `gvcp.csv` in `data/final/`.
-
-$$
-\begin{alignat*}{3}
-  & \texttt{zeroout(.)} \qquad & & \begin{bmatrix}
-    0 & 0 & \times & \times & \times & \times \\
-    0 & 0 & \times & \times & \times & \times \\
-    \times & \times & 0 & 0 & \times & \times \\
-    \times & \times & 0 & 0 & \times & \times \\
-    \times & \times & \times & \times & 0 & 0 \\
-    \times & \times & \times & \times & 0 & 0 \\
-  \end{bmatrix} \\
-  & \texttt{zeroout(., not = TRUE)} \qquad & & \begin{bmatrix}
-    \times & \times & 0 & 0 & 0 & 0 \\
-    \times & \times & 0 & 0 & 0 & 0 \\
-    0 & 0 & \times & \times & 0 & 0 \\
-    0 & 0 & \times & \times & 0 & 0\\
-    0 & 0 & 0 & 0 & \times & \times \\
-    0 & 0 & 0 & 0 & \times & \times \\
-  \end{bmatrix} \\
-  & \texttt{zeroout(., row = 1:2, col = 3:4)} \qquad & & \begin{bmatrix}
-    \times & \times & 0 & 0 & \times & \times \\
-    \times & \times & 0 & 0 & \times & \times \\
-    \times & \times & \times & \times & \times & \times \\
-    \times & \times & \times & \times & \times & \times \\
-    \times & \times & \times & \times & \times & \times \\
-    \times & \times & \times & \times & \times & \times \\
-  \end{bmatrix}
-\end{alignat*}
-$$
