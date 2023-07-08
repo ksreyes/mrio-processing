@@ -1,6 +1,9 @@
 data/interim/
 data/raw/
 
+# Python
+codes/__pycache__
+
 # R
 .Rproj.user
 .Rhistory
