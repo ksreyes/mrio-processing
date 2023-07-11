@@ -1,8 +1,8 @@
 # MRIO Processing Scripts
 
-The ADB Multi-Regional Input-Output Tables are produced by the MRIO team. The scripts in this repo processes the raw Excel files and outputs various datasets used in global value chain analysis. 
+The Asian Development Bank (ADB) Multiregional Input-Output (MRIO) Tables are produced and maintained by a dedicated team in ADB. This is the primary dataset used by the ADB global value chains (GVC) team in its research projects. For more details on input–output analysis and the derivation of GVC indicators, check out this repo's [wiki](https://github.com/adb-sna-gvc/mrio-processing/wiki).
 
-The following provides a brief description of each notebook. Note that they must be run in order.
+The scripts in this repo processes the raw Excel files and outputs various datasets used in global value chain analysis. The following is a brief description of each notebook. Note that they must be run in order.
 
 1. `process-mrios.ipynb`
 Loads Excel files from `data/raw/{foldername}/` and converts them into machine-readable format. Outputs are saved as Parquet files in `data/interim/`.
@@ -15,3 +15,6 @@ Performs the Borin and Mancini (2019) exports decomposition. Results are saved a
 
 1. `gvc-participation.ipynb`
 Computes the trade-based and production-based GVC participation rates. Results are saved as `gvcp.csv` in `data/final/`.
+
+1. `lengths.ipynb`
+Computes production lengths, segmented into domestic and foreign stages. Results are saved as `lengths.csv` in `data/final/`.
