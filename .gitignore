@@ -1,4 +1,7 @@
 data/interim/
+codes/scratch*
+images/publications.docx
+checks
 
 # Python
 codes/__pycache__
