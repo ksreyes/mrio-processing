@@ -1,5 +1,4 @@
 data/interim/
-data/raw/
 
 # Python
 codes/__pycache__
