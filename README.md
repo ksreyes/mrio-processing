@@ -4,8 +4,7 @@ The Asian Development Bank (ADB) Multiregional Input–Output (MRIO) Tables are 
 
 The scripts in this repo process the Excel files and derives various indicators from the literature. The following is a brief description of each notebook. Note that they must be run in order.
 
-|  |  |
-| ----------------- | --- |
+| --- | --- |
 | **Preprocessing**<br>[`01-preprocess-mrios.ipynb`](codes/01-preprocess-mrios.ipynb)| Converts the raw Excel files from `data/raw/{foldername}/` into machine-readable format and saves them as Parquet files in `data/mrio`. |
 | **Summary table**<br>[`02-summary-table.ipynb`](codes/02-summary-table.ipynb) | Tabulates key aggregates for each country and country-sector. Results are saved as `summary.parquet` in `data/`. |
 | **Borin–Mancini decomposition**<br>[`03-trade-accounting.ipynb`](codes/03-trade-accounting.ipynb) | Performs the Borin and Mancini (2019) exports decomposition. Results are saved as `ta.parquet`, `ta-es.parquet`, and `ta-os.parquet` in `data/trade-accounting/`. |
@@ -14,7 +13,7 @@ The scripts in this repo process the Excel files and derives various indicators 
 | **Revealed comparative advantage**<br>[`06-revealed-comparative-advantage.ipynb`](codes/06-revealed-comparative-advantage.ipynb) | Computes revealed comparative advantage indices as defined in ADB (2021). Results are saved as `rca.parquet` in `data/`. |
 | **Regional concentration**<br>[`07-regional-concentration.ipynb`](codes/07-regional-concentration.ipynb) | Computes a measure of regional trade concentration inspired by Frankel (1997). Results are saved as `rci.parquet` in `data/`. |
 | **Real effective exchange rate**<br>[`08-reer.ipynb`](codes/08-reer.ipynb) | Computes the weights matrix and the real effective exchange rate index using the Bems and Johnson (2017) and Patel, Wang, and Wei (2019) methodologies. Uses as an additional data source the MRIO price deflators in `data/raw`. Results are saved as `reer-weights.parquet`, `reer-weights-sector.parquet`, and `reer.parquet` in `data/reer/`. |
-|  |  |
+|     |     |
 
 ## References
 
@@ -27,4 +26,4 @@ The scripts in this repo process the Excel files and derives various indicators 
 
 ## Disclaimer
 
-The contents of this repository in no way reflect the views of the Asian Development Bank or the authors of cited works. All errors are my own.
+The contents of this repository are in no way endorsed by the Asian Development Bank or the authors of cited works. All errors are my own.
