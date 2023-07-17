@@ -6,7 +6,7 @@ The scripts in this repo process the Excel files and derives various indicators 
 
 |  |  |
 | ----------------- | --- |
-| **Preprocessing**<br>`01-process-mrios.ipynb`| Converts the raw Excel files from `data/raw/{foldername}/` into machine-readable format and saves them as Parquet files in `data/mrio`. |
+| **Preprocessing**<br>[`01-process-mrios.ipynb`](codes/01-process-mrios.ipynb)| Converts the raw Excel files from `data/raw/{foldername}/` into machine-readable format and saves them as Parquet files in `data/mrio`. |
 | **Summary table**<br>`02-summary-table.ipynb` | Tabulates key aggregates for each country and country-sector. Results are saved as `summary.parquet` in `data/`. |
 | **Borin–Mancini decomposition**<br>`03-trade-accounting.ipynb` | Performs the Borin and Mancini (2019) exports decomposition. Results are saved as `ta.parquet`, `ta-es.parquet`, and `ta-os.parquet` in `data/trade-accounting/`. |
 | **GVC participation**<br>`04-gvc-participation.ipynb` | Computes the trade-based and production-based GVC participation rates as defined in ADB (2021). Results are saved as `gvcp.parquet` in `data/`. |
