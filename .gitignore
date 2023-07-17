@@ -15,6 +15,7 @@ codes/__pycache__
 # R
 .Rproj.user
 .Rhistory
+adb-mrio.Rproj
 
 # Mac OS-specific storage files
 .DS_Store
