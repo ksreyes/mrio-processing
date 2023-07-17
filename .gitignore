@@ -1,4 +1,7 @@
-data/interim/
+data/mrio
+data/external
+data/trade-accounting
+data/reer
 codes/scratch*
 images/publications.docx
 checks
