@@ -7,9 +7,14 @@ def process_table(df):
     '''
     Reformat the raw Excel MRIO table to make it machine-readable
     '''
-    # Remove the last row and the first 2 columns
+    # Deduce parameters
     df = df.drop(df.index[-1])
-    df = df.iloc[:, 2:]
+    N = 35
+    f = 5
+    G = int((df.shape[0] - 8) / N)
+
+    # Remove all irrelevant columns
+    df = df.iloc[:, 2:(5 + G*N + G*f)]
 
     # Collapse MultiIndex headers into one
     df.columns = [f'{level_1}_{level_2}' for level_1, level_2 in df.columns]
