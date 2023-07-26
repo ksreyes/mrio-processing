@@ -1,6 +1,16 @@
 # ADB MRIO processing scripts
 
-The Asian Development Bank (ADB) Multiregional Input–Output (MRIO) Tables are a freely available time series of intercountry input–output tables. They have distinct information for 72 countries plus a residual "Rest of the world" entity for the years 2017–2022. A longer time series spanning 2000 and 2007–2021 is also available for a smaller set of 62 countries. Each country is disaggregated into 35 sectors.
+The Asian Development Bank (ADB) Multiregional Input–Output (MRIO) Tables are a time series of intercountry input–output tables disaggregated into 35 sectors. Final demand are disaggregated into five categories. The following is a schematic of an MRIO table.
+
+![](images/schematic.jpg)
+
+Three versions of the tables are currently available:
+
+1. **ADB MRIO 72 countries.** Available for 2017–2022.
+1. **ADB MRIO 62 countries.** Available for 2000 and 2007–2022.
+1. **ADB MRIO 62 countries constant price.** Values pegged to 2010 prices. Available for 2007–2022.
+
+## Scripts
 
 The scripts in this repo process the Excel files and derives various indicators from the literature. The following is a brief description of each notebook. Note that they must be run in order.
 
