@@ -6,9 +6,9 @@ The scripts in this repo process the Excel files and derives various indicators 
 
 | Notebook | Description |
 | -------- | ----------- |
-| **Preprocessing**<br>[`01-preprocess-mrios.ipynb`](codes/01-preprocess-mrios.ipynb)| Converts the raw Excel files from `data/raw/{foldername}/` into machine-readable format and saves them as Parquet files in `data/mrio`. |
+| **Preprocessing**<br>[`01-preprocess-mrios.ipynb`](codes/01-preprocess-mrios.ipynb)| Converts the raw Excel files from `data/raw/{foldername}/` into machine-readable format and saves them as a Parquet file in `data/mrio/`. |
 | **Summary table**<br>[`02-summary-table.ipynb`](codes/02-summary-table.ipynb) | Tabulates key aggregates for each country and country-sector. Results are saved as `summary.parquet` in `data/`. |
-| **Borin–Mancini decomposition**<br>[`03-trade-accounting.ipynb`](codes/03-trade-accounting.ipynb) | Performs the Borin and Mancini (2019) exports decomposition. Results are saved as `ta.parquet`, `ta-es.parquet`, and `ta-os.parquet` in `data/trade-accounting/`. |
+| **Borin–Mancini decomposition**<br>[`03-trade-accounting.ipynb`](codes/03-trade-accounting.ipynb) | Performs the Borin and Mancini (2019) exports decomposition. Results are saved as `ta.parquet` in `data/`. |
 | **GVC participation**<br>[`04-gvc-participation.ipynb`](codes/04-gvc-participation.ipynb) | Computes the trade-based and production-based GVC participation rates as defined in ADB (2021). Results are saved as `gvcp.parquet` in `data/`. |
 | **Production lengths**<br>[`05-production-lengths.ipynb`](codes/05-production-lengths.ipynb) | Computes production lengths following the methodology of Wang, Wei, Yu, and Zhu (2017). Results are saved as `lengths.parquet` in `data/` |
 | **Revealed comparative advantage**<br>[`06-revealed-comparative-advantage.ipynb`](codes/06-revealed-comparative-advantage.ipynb) | Computes revealed comparative advantage indices as defined in ADB (2021). Results are saved as `rca.parquet` in `data/`. |
