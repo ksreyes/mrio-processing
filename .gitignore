@@ -1,6 +1,7 @@
 data/mrio
 data/external
-data/trade-accounting
+data/adhoc
+data/ta*
 data/reer
 codes/scratch*
 codes/basic-checks*
