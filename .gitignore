@@ -1,8 +1,4 @@
-data/mrio
-data/external
-data/adhoc
-data/ta*
-data/reer
+data
 codes/scratch*
 codes/basic-checks*
 codes/colors*
