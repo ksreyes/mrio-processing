@@ -1,0 +1,36 @@
+c_ind,c_name,c_name_short,c_abv,c15_ind,c15_name,c5_ind,c5_name
+1,"Agriculture, hunting, forestry and fishing",Agriculture,AHF,1,"Agriculture, hunting, forestry, and fishing",1,Primary
+2,Mining and quarrying,Mining,MIN,2,Mining and quarrying,1,Primary
+3,"Food, beverages and tobacco",Food & beverages,FBT,3,Light manufacturing,2,Low-technology manufacturing
+4,Textiles and textile products,Textiles,TEX,3,Light manufacturing,2,Low-technology manufacturing
+5,"Leather, leather products and footwear",Leather,LTH,3,Light manufacturing,2,Low-technology manufacturing
+6,Wood and products of wood and cork,Wood,WDC,3,Light manufacturing,2,Low-technology manufacturing
+7,"Pulp, paper, printing and publishing",Paper,PPP,3,Light manufacturing,2,Low-technology manufacturing
+8,"Coke, refined petroleum and nuclear fuel",Refined fuels,CRP,4,Heavy manufacturing,3,Medium- to high-technology manufacturing
+9,Chemicals and chemical products,Chemicals,CCP,4,Heavy manufacturing,3,Medium- to high-technology manufacturing
+10,Rubber and plastics,Rubber,RBP,3,Light manufacturing,2,Low-technology manufacturing
+11,Other non-metallic mineral,Other minerals,ONM,3,Light manufacturing,3,Medium- to high-technology manufacturing
+12,Basic metals and fabricated metal,Metals,MFM,4,Heavy manufacturing,3,Medium- to high-technology manufacturing
+13,"Machinery, not elsewhere classified",Other machinery,MCH,4,Heavy manufacturing,3,Medium- to high-technology manufacturing
+14,Electrical and optical equipment,Electricals,EOE,4,Heavy manufacturing,3,Medium- to high-technology manufacturing
+15,Transport equipment,Transport equipment,TRE,4,Heavy manufacturing,3,Medium- to high-technology manufacturing
+16,"Manufacturing, not elsewhere classified; recycling",Other manufacturing,MFG,3,Light manufacturing,2,Low-technology manufacturing
+17,"Electricity, gas and water supply",Utilities,UTL,5,Utilities,2,Low-technology manufacturing
+18,Construction,Construction,CON,6,Construction,2,Low-technology manufacturing
+19,Sale and repair of motor vehicles and motorcycles; retail sale of fuel,Sale of motor vehicles,MTV,7,Trade services,4,Business services
+20,"Wholesale trade, except of motor vehicles and motorcycles",Wholesale trade,WST,7,Trade services,4,Business services
+21,"Retail trade and repair, except of motor vehicles and motorcycles",Retail trade & repair,RTR,7,Trade services,4,Business services
+22,Hotels and restaurants,Hotels & restaurants,HRS,8,Hotels and restaurants,4,Business services
+23,Inland transport,Inland transport,ITR,9,Transport services,4,Business services
+24,Water transport,Water transport,WTR,9,Transport services,4,Business services
+25,Air transport,Air transport,ATR,9,Transport services,4,Business services
+26,Other supporting transport activities,Other transport services,OTR,9,Transport services,4,Business services
+27,Post and telecommunications,Telecommunications,TEL,10,Telecommunications,4,Business services
+28,Financial intermediation,Finance,FIN,11,Financial intermediation,4,Business services
+29,Real estate activities,Real estate,REA,12,"Real estate, renting, and business activities",4,Business services
+30,Renting of machinery & equipment and other business activities,Other business services,OBA,12,"Real estate, renting, and business activities",4,Business services
+31,Public administration and defence; compulsory social security,Public administration,PAD,13,Public administration and defense,5,Personal and public services
+32,Education,Education,EDU,14,"Education, health, and social work",5,Personal and public services
+33,Health and social work,Social work,HSW,14,"Education, health, and social work",5,Personal and public services
+34,"Other community, social and personal services",Other personal services,OSV,15,Other personal services,5,Personal and public services
+35,Private households with employed persons,Private households,PHE,15,Other personal services,5,Personal and public services
