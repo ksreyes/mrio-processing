@@ -5,8 +5,10 @@ codes/adhoc*
 codes/basic-checks*
 codes/colors*
 codes/checks*
+codes/prep-for-kidb*
 images/publications.docx
 checks
+kidb
 
 # Python
 codes/__pycache__
