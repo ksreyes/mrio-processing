@@ -17,7 +17,7 @@ The scripts in this repo process the Excel files and implement various indicator
 | Script | Description |
 | -------- | ----------- |
 | **Preprocessing**<br>[`01-preprocess-mrios.py`](codes/01-preprocess-mrios.py)| Converts raw Excel files into machine-readable format. |
-| **Summary table**<br>[`02-summary-table.py`](codes/02-summary-table.py) | Tabulates key aggregates for each country-sector. |
+| **Summary tables**<br>[`02-summary-tables.py`](codes/02-summary-tables.py) | Tabulates key aggregates for each country-sector. |
 | **Value added flows**<br>[`03-value-added-flows.py`](codes/03-value-added-flows.py) | Computes value added originating from and finally absorbed in each country-sector. |
 | **Borin–Mancini decomposition**<br>[`04-exports-decomposition.py`](codes/04-exports-decomposition.py) | Performs the Borin and Mancini (2019) exports decomposition at the sector level. |
 | **GVC participation**<br>[`05-gvc-participation.py`](codes/05-gvc-participation.py) | Computes the trade-based and production-based GVC participation rates as defined in ADB (2021). |
