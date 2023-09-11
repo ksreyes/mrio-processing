@@ -1,18 +1,6 @@
 # ADB MRIO processing scripts
 
-The Asian Development Bank (ADB) [Multiregional Input–Output (MRIO) Tables](https://kidb.adb.org/mrio) are a time series of intercountry input–output tables disaggregated into 35 sectors. Final demand are disaggregated into five categories. The following is a schematic of an MRIO table.
-
-![](images/schematic.jpg)
-
-Three versions of the tables are currently available:
-
-1. **ADB MRIO 72 countries.** Available for 2017–2022.
-1. **ADB MRIO 62 countries.** Available for 2000 and 2007–2022.
-1. **ADB MRIO 62 countries constant price.** Values pegged to 2010 prices. Available for 2007–2022.
-
-## Scripts
-
-The scripts in this repo process the Excel files and implement various indicators from the input–output and global value chain literature. The following is a brief description of each. Note that they must be run in order. All outputs are saved in parquet format.
+The scripts in this repo process the ADB MRIO Excel files and implement various indicators from the input–output and global value chain literature. Download the tables [here](https://kidb.adb.org/mrio) and save each version in a seperate folder under `data/raw`. Run the scripts in the order listed below. All outputs are saved in `data` in parquet format.
 
 | Script | Description |
 | -------- | ----------- |
@@ -29,6 +17,18 @@ The scripts in this repo process the Excel files and implement various indicator
 | **Real effective exchange rate indices**<br>[`11-reer.py`](codes/11-reer.py) | Computes the weights matrix and the real effective exchange rate index using the Bems and Johnson (2017) and Patel, Wang, and Wei (2019) methodologies. |
 |     |     |
 
+## About the MRIO
+
+The Asian Development Bank [Multiregional Input–Output Tables](https://kidb.adb.org/mrio) are a time series of intercountry input–output tables disaggregated into 35 sectors. Final demand are disaggregated into five categories. The following is a schematic of an MRIO table.
+
+![](images/schematic.jpg)
+
+Three versions of the tables are currently available:
+
+1. **ADB MRIO 72 countries.** Available for 2017–2022.
+1. **ADB MRIO 62 countries.** Available for 2000 and 2007–2022.
+1. **ADB MRIO 62 countries constant price.** Values pegged to 2010 prices. Available for 2007–2022.
+
 ## References
 
 - Asian Development Bank. 2021. ["An analytical framework for studying global value chains."](https://www.adb.org/sites/default/files/publication/720461/ki2021.pdf) In *Key Indicators for Asia and the Pacific 2021*. Mandaluyong City, Philippines: Asian Development Bank.
@@ -38,7 +38,7 @@ The scripts in this repo process the Excel files and implement various indicator
 - Nikhil Patel, Zhi Wang, and Shang-Jin Wei, S. (2019). ["Global value chains and effective exchange rates at the country- sector level."](https://doi.org/10.1111/jmcb.12670) Journal of Money, Credit, and Banking, 51(1), 7–42.
 - Zhi Wang, Shang-Jin Wei, Xinding Yu, and Kunfu Zhu. 2017a. [“Characterizing global value chains: production length and upstreamness.”](https://www.nber.org/papers/w23261) *NBER Working Paper No. 23261*.
 
-## Citing
+## Citation
 
 ```bibtex
 @misc{ksreyes2023adbmrioscripts,
@@ -51,4 +51,4 @@ The scripts in this repo process the Excel files and implement various indicator
 
 ## Disclaimer
 
-The contents of this repository are in no way endorsed by the Asian Development Bank or the authors of cited works. All errors are my own.
+The contents of this repository are not endorsed by the Asian Development Bank or the authors of cited works. All errors are my own.
