@@ -1,57 +1,63 @@
-### Choose MRIO version #######################################################
-inputfolder, version = 'ADB MRIO, 72 economies', '72'
-# inputfolder, version = 'ADB MRIO, 62 economies', '62'
-# inputfolder, version = 'ADB MRIO constant price', '62c'
-###############################################################################
-
 import numpy as np
 import pandas as pd
 import os
 import re
+import time
 
-output = f'mrio-{version}.parquet'
-mrio = pd.DataFrame()
+folders = ['ADB MRIO, 72 economies', 'ADB MRIO, 62 economies', 'ADB MRIO constant price']
+versions = ['72', '62', '62c']
+N, f = 35, 5
 
-filelist = [file for file in os.listdir(f'data/raw/{inputfolder}') if not file.startswith(('~$', '.'))]
-filelist.sort()
+start = time.time()
 
-for file in filelist:
+for folder, version in zip(folders, versions):
 
-    year = re.search('[0-9]{4}', file).group()
-    mrio_t = pd.read_excel(f'data/raw/{inputfolder}/{file}', skiprows=5, header=[0,1])
+    output = f'mrio-{version}.parquet'
+    mrio = pd.DataFrame()
 
-    # Deduce parameters
-    mrio_t = mrio_t.drop(mrio_t.index[-1])
-    N = 35
-    f = 5
-    G = int((mrio_t.shape[0] - 8) / N)
+    files = [file for file in os.listdir(f'data/raw/{folder}') if re.match(r'^ADB.*MRIO', file)]
+    files.sort()
 
-    # Remove all irrelevant columns
-    mrio_t = mrio_t.iloc[:, 2:(5 + G*N + G*f)]
+    for file in files:
 
-    # Collapse MultiIndex headers into one
-    mrio_t.columns = [f'{level_1}_{level_2}' for level_1, level_2 in mrio_t.columns]
+        year = re.search('[0-9]{4}', file).group()
+        mrio_t = pd.read_excel(f'data/raw/{folder}/{file}', skiprows=5, header=[0,1])
 
-    # Rename the ToT column
-    colnames = mrio_t.columns.tolist()
-    mapping = {colnames[-1]: 'ToT'}
-    mrio_t = mrio_t.rename(columns=mapping)
+        # Deduce parameters
+        mrio_t = mrio_t.drop(mrio_t.index[-1])
+        G = int((mrio_t.shape[0] - 8) / N)
 
-    # Fix row labels
-    rowlabels = [f"{c}_{d}" if not (pd.isna(c) or c == 'ToT') else d for c, d in zip(mrio_t.iloc[:, 0], mrio_t.iloc[:, 1])]
-    mrio_t.insert(2, 'si', rowlabels)
-    mrio_t = mrio_t.iloc[:, 2:]
+        # Remove all irrelevant columns
+        mrio_t = mrio_t.iloc[:, 2:(5 + G*N + G*f)]
 
-    # Drop intermediates totals
-    mrio_t = mrio_t.drop(mrio_t[mrio_t['si'] == 'r60'].index)
+        # Collapse MultiIndex headers into one
+        mrio_t.columns = [f'{level_1}_{level_2}' for level_1, level_2 in mrio_t.columns]
 
-    # Replace blank cells with zero
-    mrio_t = mrio_t.replace(' ', 0)
+        # Rename the ToT column
+        colnames = mrio_t.columns.tolist()
+        mapping = {colnames[-1]: 'ToT'}
+        mrio_t = mrio_t.rename(columns=mapping)
 
-    mrio_t.insert(0, 't', year)
-    mrio_t['t'] = mrio_t['t'].astype(np.uint16)
-    mrio = pd.concat([mrio, mrio_t], ignore_index=True)
+        # Fix row labels
+        rowlabels = [f"{c}_{d}" if not (pd.isna(c) or c == 'ToT') else d for c, d in zip(mrio_t.iloc[:, 0], mrio_t.iloc[:, 1])]
+        mrio_t.insert(2, 'si', rowlabels)
+        mrio_t = mrio_t.iloc[:, 2:]
 
-    print(f'{year} done')
+        # Drop intermediates totals
+        mrio_t = mrio_t.drop(mrio_t[mrio_t['si'] == 'r60'].index)
 
-mrio.to_parquet(f'data/{output}', index=False)
+        # Replace blank cells with zero
+        mrio_t = mrio_t.replace(' ', 0)
+
+        mrio_t.insert(0, 't', year)
+        mrio = pd.concat([mrio, mrio_t], ignore_index=True)
+
+        # Time check
+        checkpoint = time.time()
+        elapsed = checkpoint - start
+        time_elapsed = f'{int(elapsed // 60)} mins {round(elapsed % 60, 1)} secs'
+
+        print(f'\n{folder}: {year} done. \nTime elapsed: {time_elapsed}.\n')
+
+    mrio['t'] = mrio['t'].astype(np.uint16)
+    mrio.to_parquet(f'data/{output}', index=False)
