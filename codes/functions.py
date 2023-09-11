@@ -1,64 +1,4 @@
 import numpy as np
-import pandas as pd
-import os
-import re
-
-def process_table(df):
-    '''
-    Reformat the raw Excel MRIO table to make it machine-readable
-    '''
-    # Deduce parameters
-    df = df.drop(df.index[-1])
-    N = 35
-    f = 5
-    G = int((df.shape[0] - 8) / N)
-
-    # Remove all irrelevant columns
-    df = df.iloc[:, 2:(5 + G*N + G*f)]
-
-    # Collapse MultiIndex headers into one
-    df.columns = [f'{level_1}_{level_2}' for level_1, level_2 in df.columns]
-
-    # Rename the ToT column
-    colnames = df.columns.tolist()
-    mapping = {colnames[-1]: 'ToT'}
-    df = df.rename(columns=mapping)
-
-    # Fix row labels
-    rowlabels = [f"{c}_{d}" if not (pd.isna(c) or c == 'ToT') else d for c, d in zip(df.iloc[:, 0], df.iloc[:, 1])]
-    df.insert(2, 'si', rowlabels)
-    df = df.iloc[:, 2:]
-    
-    # Drop intermediates totals
-    df = df.drop(df[df['si'] == 'r60'].index)
-
-    # Replace blank cells with zero
-    df = df.replace(' ', 0)
-
-    return df
-
-def load_and_save(inputfolder, outputfile, version=None):
-    '''
-    Load raw Excel tables, process them using process_table(), stack all years into one file, 
-    then export as Parquet file
-    '''
-    mrio = pd.DataFrame()
-
-    filelist = [file for file in os.listdir(f'../data/raw/{inputfolder}') if not file.startswith(('~$', '.'))]
-    filelist.sort()
-
-    for file in filelist:
-        year = re.search('[0-9]{4}', file).group()
-        mrio_t = pd.read_excel(f'../data/raw/{inputfolder}/{file}', skiprows=5, header=[0,1])
-        mrio_t = process_table(mrio_t)
-        mrio_t.insert(0, 't', year)
-        mrio = pd.concat([mrio, mrio_t], ignore_index=True)
-        print(f'{year} done')
-        
-    if version is None:
-        mrio.to_parquet(f'../data/mrio/{outputfile}.parquet', index=False)
-    else:
-        mrio.to_parquet(f'../data/mrio/{outputfile}_{version}.parquet', index=False)
 
 def subset(matrix, row=None, col=None, N=35):
 
@@ -163,7 +103,7 @@ def diagvec(vector, N=35):
     vector = np.squeeze(vector)
     length = vector.shape[0]
     G = length // N
-    matrix = np.zeros((length, G))
+    matrix = np.zeros((length, G), dtype=np.float32)
     for k in range(G):
         matrix[k*N:(k+1)*N, k] = vector[k*N:(k+1)*N]
     return matrix
