@@ -6,6 +6,7 @@ from functions import asvector
 np.seterr(divide='ignore', invalid='ignore')
 
 mrio_versions = ['72', '62', '62c']
+sectors = duckdb.sql("SELECT * FROM read_csv_auto('dicts/sectors.csv')").df()
 N, f = 35, 5
 
 start = time.time()
@@ -14,7 +15,6 @@ for version in mrio_versions:
 
     input, output = f'mrio-{version}.parquet', f'flows-{version}.parquet'
 
-    sectors = duckdb.sql("SELECT * FROM read_csv_auto('dicts/sectors.csv')").df()
     years = duckdb.sql(f"SELECT DISTINCT t FROM 'data/{input}' ORDER BY t").df()['t']
     rows = duckdb.sql(f"SELECT count(*) FROM 'data/{input}'").df()
     G = int((rows.iloc[0, 0] / len(years) - 7) / N)

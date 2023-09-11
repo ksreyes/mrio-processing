@@ -2,8 +2,8 @@ import numpy as np
 import duckdb
 
 mrio_versions = ['72', '62', '62c']
-N, f = 35, 5
 sectors = duckdb.sql("SELECT * FROM read_csv_auto('dicts/sectors.csv')").df()
+N, f = 35, 5
 
 for version in mrio_versions:
 
