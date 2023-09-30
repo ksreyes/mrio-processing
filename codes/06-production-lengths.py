@@ -1,85 +1,70 @@
 import numpy as np
 import pandas as pd
 import duckdb
-from functions import zeroout, get_fatdiag
-np.seterr(divide='ignore', invalid='ignore')
-
-mrio_versions = ['72', '62', '62c']
-sectors = duckdb.sql("SELECT * FROM read_csv_auto('dicts/sectors.csv')").df()
-N, f = 35, 5
+import time
+from mrio import MRIO, progress_check, get_years, convert_dtypes
 
 start = time.time()
+mrio_versions = ['72', '62', '62c']
 
 for version in mrio_versions:
 
-    input, output = f'mrio-{version}.parquet', f'apl-{version}.parquet'
-
-    years = duckdb.sql(f"SELECT DISTINCT t FROM 'data/{input}' ORDER BY t").df()['t']
-    rows = duckdb.sql(f"SELECT COUNT(*) FROM 'data/{input}'").df()
-    G = int((rows.iloc[0, 0] / len(years) - 7) / N)
-
     df = pd.DataFrame()
+    input, output = f'mrio-{version}.parquet', f'apl-{version}.parquet'
+    years = get_years(f'data/{input}')
 
     for year in years:
+
+        mrio = MRIO(f'data/{input}', year, full=True)
+        G, N = mrio.G, mrio.N
         
-        mrio = duckdb.sql(f"SELECT * EXCLUDE(t, si) FROM 'data/{input}' WHERE t={year}").df()
-        mrio = mrio.values.astype(np.float32)
+        v = mrio.v.diag()
+        y = mrio.Y.row_sum().diag()
+        yd = mrio.Y.get_fatdiag().diag()
+        yf = (mrio.Y.row_sum() - mrio.Y.get_fatdiag()).diag()
+        Ad = mrio.A.zeroout(inverse=True)
+        Af = mrio.A.zeroout()
+        B = mrio.B
+        Bd = (mrio.I(G*N) - Ad).invert()
 
-        x = mrio[-1][:(G*N)]
-        Z = mrio[:(G*N)][:, :(G*N)]
-        va = np.sum(mrio[-7:-1][:, :(G*N)], axis=0)
-        Y_big = mrio[:(G*N)][:, (G*N):-1]
-        Y = Y_big @ np.kron(np.eye(G, dtype=np.uint8), np.ones((f, 1), dtype=np.uint8))
-        y = np.sum(Y, axis=1)
-        yd = get_fatdiag(Y)
-        yf = y - yd
-        v = np.where(x != 0, va / x, 0)
-        Dx = np.diag(np.where(x != 0, 1 / x, 0))
-        A = Z @ Dx
-        Ad, Af = zeroout(A, inverse=True), zeroout(A)
-        B = np.linalg.inv(np.eye(G*N, dtype=np.uint8) - A)
-        Bd = np.linalg.inv(np.eye(G*N, dtype=np.uint8) - Ad)
-
-        X = np.diag(v) @ B @ B @ np.diag(y)
-        X_D = np.diag(v) @ Bd @ Bd @ np.diag(yd)
-        X_RT = np.diag(v) @ Bd @ Bd @ np.diag(yf)
-        Xd_GVC = np.diag(v) @ Bd @ Bd @ Af @ B @ np.diag(y)
-        E_GVC = np.diag(v) @ B @ Af @ B @ np.diag(y)
-        Xf_GVC = np.diag(v) @ Bd @ Af @ B @ Ad @ B @ np.diag(y)
-        VY_D = np.diag(v) @ Bd @ np.diag(yd)
-        VY_RT = np.diag(v) @ Bd @ np.diag(yf)
-        VY_GVC = np.diag(v) @ Bd @ Af @ B @ np.diag(y)
+        X = v @ B @ B @ y
+        X_D = v @ Bd @ Bd @ yd
+        X_RT = v @ Bd @ Bd @ yf
+        Xd_GVC = v @ Bd @ Bd @ Af @ B @ y
+        E_GVC = v @ B @ Af @ B @ y
+        Xf_GVC = v @ Bd @ Af @ B @ Ad @ B @ y
+        VY_D = v @ Bd @ yd
+        VY_RT = v @ Bd @ yf
+        VY_GVC = v @ Bd @ Af @ B @ y
 
         df_t = pd.DataFrame({
             't': year, 
-            's': np.arange(1, G+1, dtype=np.uint8).repeat(N),
-            'i': np.tile(sectors['c_ind'], G), 
-            'i5': np.tile(sectors['c5_ind'], G), 
-            'i15': np.tile(sectors['c15_ind'], G),
-            'va': va, 
-            'y': y,
-            'Xv': np.sum(X, axis=1),
-            'Xv_D': np.sum(X_D, axis=1),
-            'Xv_RT': np.sum(X_RT, axis=1),
-            'Xvd_GVC': np.sum(Xd_GVC, axis=1),
-            'Ev_GVC': np.sum(E_GVC, axis=1),
-            'Xvf_GVC': np.sum(Xf_GVC, axis=1),
-            'V_D': np.sum(VY_D, axis=1),
-            'V_RT': np.sum(VY_RT, axis=1),
-            'V_GVC': np.sum(VY_GVC, axis=1),
-            'Xy': np.sum(X, axis=0),
-            'Xy_D': np.sum(X_D, axis=0),
-            'Xy_RT': np.sum(X_RT, axis=0),
-            'Xyd_GVC': np.sum(Xd_GVC, axis=0),
-            'Ey_GVC': np.sum(E_GVC, axis=0),
-            'Xyf_GVC': np.sum(Xf_GVC, axis=0),
-            'Y_D': np.sum(VY_D, axis=0),
-            'Y_RT': np.sum(VY_RT, axis=0),
-            'Y_GVC': np.sum(VY_GVC, axis=0)
+            's': mrio.country_inds().repeat(N),
+            'i': np.tile(mrio.sector_inds(), G), 
+            'i5': np.tile(mrio.sector_inds(agg=5), G), 
+            'i15': np.tile(mrio.sector_inds(agg=15), G),
+            'va': mrio.va.data, 
+            'y': mrio.Y.row_sum().data,
+            'Xv': X.row_sum().data,
+            'Xv_D': X_D.row_sum().data,
+            'Xv_RT': X_RT.row_sum().data,
+            'Xvd_GVC': Xd_GVC.row_sum().data,
+            'Ev_GVC': E_GVC.row_sum().data,
+            'Xvf_GVC': Xf_GVC.row_sum().data,
+            'V_D': VY_D.row_sum().data,
+            'V_RT': VY_RT.row_sum().data,
+            'V_GVC': VY_GVC.row_sum().data,
+            'Xy': X.col_sum().data,
+            'Xy_D': X_D.col_sum().data,
+            'Xy_RT': X_RT.col_sum().data,
+            'Xyd_GVC': Xd_GVC.col_sum().data,
+            'Ey_GVC': E_GVC.col_sum().data,
+            'Xyf_GVC': Xf_GVC.col_sum().data,
+            'Y_D': VY_D.col_sum().data,
+            'Y_RT': VY_RT.col_sum().data,
+            'Y_GVC': VY_GVC.col_sum().data
         })
         df = pd.concat([df, df_t], ignore_index=True)
-        
-        print(f'{year} done')
 
     sum_terms = '''
         sum(Xv) / sum(va) AS PLv, 
@@ -118,26 +103,13 @@ for version in mrio_versions:
         """
     ).df()
 
-    apl['t'] = apl['t'].astype(np.uint16)
-    apl['agg'] = apl['agg'].astype(np.uint8)
-    apl['i'] = apl['i'].astype(np.uint8)
-
-    apl['PLv'] = apl['PLv'].astype(np.float32)
-    apl['PLv_D'] = apl['PLv_D'].astype(np.float32)
-    apl['PLv_RT'] = apl['PLv_RT'].astype(np.float32)
-    apl['PLvd_GVC'] = apl['PLvd_GVC'].astype(np.float32)
-    apl['CBv_GVC'] = apl['CBv_GVC'].astype(np.float32)
-    apl['PLvf_GVC'] = apl['PLvf_GVC'].astype(np.float32)
-
-    apl['PLy'] = apl['PLy'].astype(np.float32)
-    apl['PLy_D'] = apl['PLy_D'].astype(np.float32)
-    apl['PLy_RT'] = apl['PLy_RT'].astype(np.float32)
-    apl['PLyd_GVC'] = apl['PLyd_GVC'].astype(np.float32)
-    apl['CBy_GVC'] = apl['CBy_GVC'].astype(np.float32)
-    apl['PLyf_GVC'] = apl['PLyf_GVC'].astype(np.float32)
-
     apl['PLv_GVC'] = apl['PLvd_GVC'] + apl['CBv_GVC'] + apl['PLvf_GVC']
     apl['PLy_GVC'] = apl['PLyd_GVC'] + apl['CBy_GVC'] + apl['PLyf_GVC']
     apl['GVC_POS'] = apl['PLv_GVC'] / apl['PLy_GVC']
-
+    
+    apl = convert_dtypes(apl)
     apl.to_parquet(f'data/{output}', index=False)
+
+    progress_check(start, version)
+
+print('')
