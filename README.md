@@ -5,8 +5,8 @@ The scripts in this repo process the ADB MRIO Excel files and implement various 
 | Script | Description |
 | -------- | ----------- |
 | **Preprocessing**<br>[`01-preprocess-mrios.py`](codes/01-preprocess-mrios.py)| Converts raw Excel files into machine-readable format. |
-| **Summary tables**<br>[`02-summary-tables.py`](codes/02-summary-tables.py) | Tabulates key aggregates for each country-sector. |
-| **Value added flows**<br>[`03-value-added-flows.py`](codes/03-value-added-flows.py) | Computes value added originating from and finally absorbed in each country-sector. |
+| **Summary tables**<br>[`02-summary.py`](codes/02-summary.py) | Tabulates key aggregates for each country-sector. |
+| **Flows**<br>[`03-flows.py`](codes/03-flows.py) | Computes intermediates, final goods, and value added flows between each country-sector. |
 | **Borin–Mancini decomposition**<br>[`04-exports-decomposition.py`](codes/04-exports-decomposition.py) | Performs the Borin and Mancini (2019) exports decomposition at the sector level. |
 | **GVC participation**<br>[`05-gvc-participation.py`](codes/05-gvc-participation.py) | Computes the trade-based and production-based GVC participation rates as defined in ADB (2021). |
 | **Production lengths**<br>[`06-production-lengths.py`](codes/06-production-lengths.py) | Computes production lengths following the methodology of Wang, Wei, Yu, and Zhu (2017). |
