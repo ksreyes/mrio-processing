@@ -1,6 +1,6 @@
 import numpy as np
 import duckdb
-import time
+import utils
 
 class MRIO:
 
@@ -8,23 +8,20 @@ class MRIO:
 
     def __init__(self, file_path, year, full=False):
         
-        # Get year and size attributes
-
-        years = get_years(f'{file_path}')
+        years = utils.get_years(f'{file_path}')
         if year not in years:
             raise ValueError('selected year is out of bounds.')
-        self.year = year
-
-        rows = duckdb.sql(f"SELECT count(*) FROM '{file_path}'").df()
-        self.N = 35
-        self.f = 5
-        self.G = int((rows.iloc[0, 0] / len(years) - 7) / self.N)
-
-        # Extract MRIO components
-
+        
         mrio = duckdb.sql(f"SELECT * EXCLUDE(t, si) FROM '{file_path}' WHERE t={year}").df()
+        
+        self.year = year
         self.data = mrio.values
         self.shape = mrio.shape
+        self.N = 35
+        self.f = 5
+        self.G = int((self.shape[0] - 7) / self.N)
+        
+        '''Extract MRIO components'''
         
         x = self.data[-1][:(self.G * self.N)]
         Z = self.data[:(self.G * self.N)][:, :(self.G * self.N)]
@@ -48,7 +45,7 @@ class MRIO:
             self.A = SubMRIO(A, self.G, self.N)
             self.B = SubMRIO(B, self.G, self.N)
     
-    # Numpy wrappers
+    '''Numpy wrappers'''
 
     def I(self, dim):
         return SubMRIO(np.eye(dim, dtype=bool), self.G, self.N)
@@ -56,7 +53,7 @@ class MRIO:
     def i(self, dim):
         return SubMRIO(np.ones(dim, dtype=bool), self.G, self.N)
         
-    # Index generators
+    '''Index generators'''
     
     def country_inds(self, exclude=None):
 
@@ -93,7 +90,7 @@ class SubMRIO(MRIO):
         self.G = ncountries
         self.N = nsectors
     
-    # Ensure that results of matrix operations remain in class
+    '''Ensure that results of matrix operations remain in class'''
     
     def __add__(self, other):
         if isinstance(other, SubMRIO):
@@ -138,7 +135,7 @@ class SubMRIO(MRIO):
                 self.data.dtype = np.uint8
         return SubMRIO(np.where(self.data != 0, other/self.data, 0), self.G, self.N)
     
-    # Wrappers for numpy methods
+    '''Wrappers for numpy methods'''
 
     def diag(self):
         return SubMRIO(np.diag(self.data), self.G, self.N)
@@ -152,7 +149,7 @@ class SubMRIO(MRIO):
     def t(self):
         return SubMRIO(np.transpose(self.data), self.G, self.N)
     
-    # Custom methods
+    '''Custom methods'''
     
     def col_sum(self, chunk=None):
         '''
@@ -313,75 +310,3 @@ class SubMRIO(MRIO):
         for k in range(GG):
             matrix = np.hstack((matrix, np.diag(vector[k * self.N:(k+1) * self.N])))
         return SubMRIO(matrix, self.G, self.N)
-
-def get_years(file_path):
-    years = duckdb.sql(f"SELECT DISTINCT t FROM '{file_path}' ORDER BY t").df()['t']
-    return years.values
-
-def progress_check(start_time, mrio_version, current_year=None):
-
-    checkpoint = time.time()
-    elapsed = checkpoint - start_time
-    mins = int(elapsed // 60)
-    secs = round(elapsed % 60, 1)
-
-    if mins == 0:
-        time_elapsed = f'Time elapsed: {secs} secs.'
-    else:
-        time_elapsed = f'Time elapsed: {mins} mins {secs} secs.'
-
-    if current_year is not None:
-        status = f'MRIO-{mrio_version}: {current_year} done.'
-    else:
-        status = f'MRIO-{mrio_version} done.'
-    
-    print(f'\n{status}\n{time_elapsed}')
-
-def convert_dtypes(dataframe):
-
-    for col in dataframe.columns:
-
-        if dataframe[col].dtypes == 'object':
-            continue
-
-        min = dataframe[col].min()
-        max = dataframe[col].max()
-
-        if 0 <= min and max <= 255 and min % 1 == 0 and max % 1 == 0:
-            dataframe[col] = dataframe[col].astype(np.uint8)
-        elif 255 < min and max <= 65535 and min % 1 == 0 and max % 1 == 0:
-            dataframe[col] = dataframe[col].astype(np.uint16)
-        else:
-            dataframe[col] = dataframe[col].astype(np.float32)
-
-    return dataframe
-
-def aggregate_sectors(dataframe, cols_index, cols_to_sum):
-
-    for i in range(len(cols_to_sum)):
-        cols_to_sum[i] = f'sum({cols_to_sum[i]}) AS {cols_to_sum[i]}'
-    
-    cols_index = ', '.join(cols_index)
-    cols_to_sum = ', '.join(cols_to_sum)
-
-    return duckdb.sql(
-        f'''
-        (SELECT {cols_index}, 0 AS agg, 0 AS i, {cols_to_sum}
-         FROM {dataframe} GROUP BY {cols_index} ORDER BY {cols_index})
-
-        UNION ALL
-
-        (SELECT {cols_index}, 5 AS agg, i5 AS i, {cols_to_sum}
-         FROM {dataframe} GROUP BY {cols_index}, i5 ORDER BY {cols_index}, i5)
-
-        UNION ALL
-
-        (SELECT {cols_index}, 15 AS agg, i15 AS i, {cols_to_sum}
-         FROM {dataframe} GROUP BY {cols_index}, i15 ORDER BY {cols_index}, i15)
-
-        UNION ALL
-
-        (SELECT {cols_index}, 35 AS agg, i, {cols_to_sum}
-         FROM {dataframe} GROUP BY {cols_index}, i ORDER BY {cols_index}, i)
-        '''
-    ).df()
