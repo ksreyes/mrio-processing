@@ -1,8 +1,8 @@
-import numpy as np
 import pandas as pd
 import duckdb
 import time
-from mrio import MRIO, progress_check, get_years, convert_dtypes
+from mrio import MRIO
+from utils import get_years, ind_pattern, aggregate_sectors, convert_dtypes, progress_check
 
 start = time.time()
 mrio_versions = ['72', '62', '62c']
@@ -10,7 +10,8 @@ mrio_versions = ['72', '62', '62c']
 for version in mrio_versions:
 
     df = pd.DataFrame()
-    input, output = f'mrio-{version}.parquet', f'apl-{version}.parquet'
+    input = f'mrio-{version}.parquet'
+    output = f'apl-{version}.parquet'
     years = get_years(f'data/{input}')
 
     for year in years:
@@ -39,10 +40,8 @@ for version in mrio_versions:
 
         df_t = pd.DataFrame({
             't': year, 
-            's': mrio.country_inds().repeat(N),
-            'i': np.tile(mrio.sector_inds(), G), 
-            'i5': np.tile(mrio.sector_inds(agg=5), G), 
-            'i15': np.tile(mrio.sector_inds(agg=15), G),
+            's': ind_pattern(mrio.country_inds(), repeat=N),
+            'i': ind_pattern(mrio.sector_inds(), tile=G), 
             'va': mrio.va.data, 
             'y': mrio.Y.row_sum().data,
             'Xv': X.row_sum().data,
@@ -66,46 +65,44 @@ for version in mrio_versions:
         })
         df = pd.concat([df, df_t], ignore_index=True)
 
-    sum_terms = '''
-        sum(Xv) / sum(va) AS PLv, 
-        sum(Xv_D) / sum(V_D) AS PLv_D, 
-        sum(Xv_RT) / sum(V_RT) AS PLv_RT, 
-        sum(Xvd_GVC) / sum(V_GVC) AS PLvd_GVC, 
-        sum(Ev_GVC) / sum(V_GVC) AS CBv_GVC, 
-        sum(Xvf_GVC) / sum(V_GVC) AS PLvf_GVC, 
-        sum(Xy) / sum(y) AS PLy, 
-        sum(Xy_D) / sum(Y_D) AS PLy_D, 
-        sum(Xy_RT) / sum(Y_RT) AS PLy_RT, 
-        sum(Xyd_GVC) / sum(Y_GVC) AS PLyd_GVC, 
-        sum(Ey_GVC) / sum(Y_GVC) AS CBy_GVC, 
-        sum(Xyf_GVC) / sum(Y_GVC) AS PLyf_GVC
-        '''
+    apl = aggregate_sectors(
+        table = 'df',
+        cols_index = ['t', 's'],
+        cols_to_sum = [
+            'va', 'y',
+            'Xv', 'Xv_D', 'Xv_RT', 'Xvd_GVC', 'Ev_GVC', 'Xvf_GVC', 'V_D', 'V_RT', 'V_GVC',
+            'Xy', 'Xy_D', 'Xy_RT', 'Xyd_GVC', 'Ey_GVC', 'Xyf_GVC', 'Y_D', 'Y_RT', 'Y_GVC'
+        ])
 
     apl = duckdb.sql(
-        f"""
-        (SELECT t, s, 0 AS agg, 0 AS i, {sum_terms}
-        FROM df GROUP BY t, s ORDER BY t, s)
-
-        UNION ALL
-
-        (SELECT t, s, 5 AS agg, i5 AS i, {sum_terms}
-        FROM df GROUP BY t, s, i5 ORDER BY t, s, i5)
-
-        UNION ALL
-
-        (SELECT t, s, 15 AS agg, i15 AS i, {sum_terms}
-        FROM df GROUP BY t, s, i15 ORDER BY t, s, i15)
-
-        UNION ALL
-
-        (SELECT t, s, 35 AS agg, i, {sum_terms}
-        FROM df GROUP BY t, s, i ORDER BY t, s, i)
-        """
+        '''
+        SELECT t, s, agg, i, 
+            Xv / va          AS  PLv, 
+            Xv_D / V_D       AS  PLv_D, 
+            Xv_RT / V_RT     AS  PLv_RT, 
+            Xvd_GVC / V_GVC  AS  PLvd_GVC, 
+            Ev_GVC / V_GVC   AS  CBv_GVC, 
+            Xvf_GVC / V_GVC  AS  PLvf_GVC, 
+            Xy / y           AS  PLy, 
+            Xy_D / Y_D       AS  PLy_D, 
+            Xy_RT / Y_RT     AS  PLy_RT, 
+            Xyd_GVC / Y_GVC  AS  PLyd_GVC, 
+            Ey_GVC / Y_GVC   AS  CBy_GVC, 
+            Xyf_GVC / Y_GVC  AS  PLyf_GVC
+        FROM apl
+        '''
     ).df()
 
-    apl['PLv_GVC'] = apl['PLvd_GVC'] + apl['CBv_GVC'] + apl['PLvf_GVC']
-    apl['PLy_GVC'] = apl['PLyd_GVC'] + apl['CBy_GVC'] + apl['PLyf_GVC']
-    apl['GVC_POS'] = apl['PLv_GVC'] / apl['PLy_GVC']
+    apl = duckdb.sql(
+        '''
+        SELECT *, 
+            PLvd_GVC + CBv_GVC + PLvf_GVC        AS  PLv_GVC,
+            PLyd_GVC + CBy_GVC + PLyf_GVC        AS  PLy_GVC,
+            (PLvd_GVC + CBv_GVC + PLvf_GVC) / 
+                (PLyd_GVC + CBy_GVC + PLyf_GVC)  AS  GVC_POS
+        FROM apl
+        '''
+    ).df()
     
     apl = convert_dtypes(apl)
     apl.to_parquet(f'data/{output}', index=False)
