@@ -1,17 +1,17 @@
-import numpy as np
 import pandas as pd
 import time
-from mrio import MRIO, progress_check, get_years, convert_dtypes
+from mrio import MRIO
+from utils import get_years, ind_pattern, convert_dtypes, progress_check
 
 start = time.time()
-# mrio_versions = ['72', '62', '62c']
-mrio_versions = ['62']
+mrio_versions = ['72', '62', '62c']
 
 for version in mrio_versions:
 
-    ed_es, ed_os = pd.DataFrame(), pd.DataFrame()
-    input, output = f'mrio-{version}.parquet', f'ed-{version}.parquet'
+    input = f'mrio-{version}.parquet'
+    output = f'ed-{version}.parquet'
     years = get_years(f'data/{input}')
+    ed_es, ed_os = pd.DataFrame(), pd.DataFrame()
 
     for year in years:
         
@@ -54,9 +54,9 @@ for version in mrio_versions:
             ed_es_s = pd.DataFrame({
                 't': year, 
                 's': s, 
-                'r': mrio.country_inds(exclude=s).repeat(N),
+                'r': ind_pattern(mrio.country_inds(exclude=s), repeat=N),
                 'breakdown': 'es',
-                'i': np.tile(mrio.sector_inds(), G-1), 
+                'i': ind_pattern(mrio.sector_inds(), tile=G-1), 
                 'exports': Exports.asvector().data,
                 'davax1': DAVAX1.asvector().data,
                 'davax2': DAVAX2.asvector().data,
@@ -89,10 +89,9 @@ for version in mrio_versions:
             ed_os_s = pd.DataFrame({
                 't': year, 
                 's': s, 
-                'r': mrio.country_inds(exclude=s).repeat(N),
+                'r': ind_pattern(mrio.country_inds(exclude=s), repeat=N),
                 'breakdown': 'os',
-                'i': np.tile(mrio.sector_inds(), G-1), 
-                'exports': np.nan,
+                'i': ind_pattern(mrio.sector_inds(), tile=G-1), 
                 'davax1': DAVAX1.asvector().data,
                 'davax2': DAVAX2.asvector().data,
                 'rex1': REX1.asvector().data,
@@ -105,14 +104,6 @@ for version in mrio_versions:
                 'pdc2': PDC2.asvector().data
             })
             ed_os = pd.concat([ed_os, ed_os_s], ignore_index=True)
-
-        # Time check
-        # checkpoint_end = time.time()
-        # elapsed = checkpoint_end - checkpoint_start
-        # tot_elapsed = checkpoint_end - start
-        # time_elapsed = f'{int(tot_elapsed // 60)} mins {round(tot_elapsed % 60, 1)} secs'
-
-        # print(f'\nMRIO-{version}: {year} done. \nTime elapsed: {time_elapsed}.')
 
         progress_check(start, version, year)
 
