@@ -261,7 +261,7 @@ class SubMRIO(MRIO):
         '''
         Get the N-length vectors running along the diagonal of a matrix.
         '''
-        GG = self.data.shape[0] // N
+        GG = self.data.shape[0] // self.N
         vector = []
         for k in range(GG):
             vector.extend(self.data[k * self.N:(k+1) * self.N, k])
