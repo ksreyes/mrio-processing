@@ -1,6 +1,7 @@
 import pandas as pd
 import time
-from mrio import MRIO, progress_check, get_years
+from mrio import MRIO
+from utils import get_years, progress_check
 
 start = time.time()
 mrio_versions = ['72', '62']
