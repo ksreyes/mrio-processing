@@ -5,7 +5,8 @@ mrio_versions = ['72', '62', '62c']
 
 for version in mrio_versions:
 
-    ed, flows, output = f'ed-{version}.parquet', f'flows-{version}.parquet', f'rci-{version}.parquet'
+    ed, flows = f'ed-{version}.parquet', f'flows-{version}.parquet'
+    output = f'rci-{version}.parquet'
     
     if version == '72':
         index = 'mrio'
@@ -24,7 +25,7 @@ for version in mrio_versions:
 
     intlflows = duckdb.sql(
         f"""
-        SELECT t, s, r, SUM(flows) AS flows
+        SELECT t, s, r, SUM(va_flows) AS flows
         FROM 'data/{flows}'
         WHERE s<>r
         GROUP BY t, s, r
@@ -33,7 +34,7 @@ for version in mrio_versions:
     ).df()
 
     countries = pd.read_excel('dicts/countries.xlsx')
-    rta = countries[[f'{index}', 'rta_asean', 'rta_carec', 'rta_eaeu', 'rta_eu', 'rta_nafta', 'rta_safta']]
+    rta = countries[[f'{index}', 'rta_asean', 'rta_carec', 'rta_carec10', 'rta_eaeu', 'rta_eu', 'rta_nafta', 'rta_safta']]
     rta = rta.fillna(0)
 
     def compute_rci(method):
