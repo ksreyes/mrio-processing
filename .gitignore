@@ -1,5 +1,7 @@
 data
 codes/archive
+codes/demo*
+codes/view-outputs*
 codes/scratch*
 codes/adhoc*
 codes/basic-checks*
@@ -8,6 +10,7 @@ codes/checks*
 codes/prep-for-kidb*
 images/publications.docx
 checks
+dicts/sectors.xlsx
 kidb
 
 # Python
